@@ -33,14 +33,23 @@ int main()
             printf("Error found!\r\n");
             break;
         }
-        Sleep(300);//只有media解析加载完成，才会有下面的参数
-        int vol = libvlc_audio_get_volume(player);
-
+        int vol = -1;
+        //只有media解析加载完成，才会有下面的参数
+        while (vol == -1) {
+            Sleep(10);
+            vol = libvlc_audio_get_volume(player);
+        }
+        printf("Volume is %d\r\n", vol);
+        vol = libvlc_audio_set_volume(player, 10);
         libvlc_time_t tm = libvlc_media_player_get_length(player);
         printf("%02d:%02d:%02d.%03d\r\n", int(tm / 3600000), int(tm / 60000) % 60, int(tm / 1000) % 60, int(tm) % 1000);
         int width = libvlc_video_get_width(player);
         int height = libvlc_video_get_height(player);
         printf("width = %d height = %d\r\n", width, height);
+        while (!_kbhit()) {
+            printf("%f%%\r", 100.0 * libvlc_media_player_get_position(player));
+            Sleep(500);
+        }
         getchar();
         libvlc_media_player_pause(player);
         getchar();
